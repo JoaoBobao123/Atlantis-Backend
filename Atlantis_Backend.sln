@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.35027.167
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Atlantis_Backend", "Atlantis_Backend\Atlantis_Backend.csproj", "{DA3835C8-5E73-42A6-87CF-70D7D0AFDECD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DA3835C8-5E73-42A6-87CF-70D7D0AFDECD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA3835C8-5E73-42A6-87CF-70D7D0AFDECD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA3835C8-5E73-42A6-87CF-70D7D0AFDECD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA3835C8-5E73-42A6-87CF-70D7D0AFDECD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5AEAEAF6-B842-4464-8134-FE0466A238D6}
+	EndGlobalSection
+EndGlobal
