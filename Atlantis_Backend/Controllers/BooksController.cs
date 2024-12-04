@@ -26,18 +26,14 @@ namespace Atlantis_Backend.Controllers
             new Book { Id = 14, Title = "Sagarana", Author = "João Guimarães Rosa", Year = 1946, Quantity = 3 },
             new Book { Id = 15, Title = "Fogo Morto", Author = "José Lins do Rego", Year = 1943, Quantity = 1 }
         };
-
-        // Retorna todos os livros disponíveis
         [HttpGet]
-        public ActionResult<IEnumerable<Book>> GetAllAvailableBooks()
+        public ActionResult<List<Book>> GetAllAvailableBooks()
         {
             var availableBooks = Books.Where(b => b.Quantity > 0).ToList();
             return Ok(availableBooks);
         }
-
-        // Retorna um livro específico pelo ID
         [HttpGet("{id}")]
-        public ActionResult<Book> GetBookById(int id)
+        public ActionResult<Book> PegarLivro(int id)
         {
             var book = Books.FirstOrDefault(b => b.Id == id);
             if (book == null || book.Quantity == 0)
@@ -46,8 +42,6 @@ namespace Atlantis_Backend.Controllers
             }
             return Ok(book);
         }
-
-        // Aluga um livro (reduz a quantidade disponível)
         [HttpPut("{id}/rent")]
         public ActionResult RentBook(int id)
         {
@@ -61,25 +55,8 @@ namespace Atlantis_Backend.Controllers
             {
                 return BadRequest(new { Message = $"O livro '{book.Title}' está esgotado no momento!" });
             }
-
-            // Reduz a quantidade disponível
             book.Quantity--;
             return Ok(new { Message = $"Você alugou o livro '{book.Title}'.", RemainingQuantity = book.Quantity });
-        }
-
-        // Desaluga um livro (aumenta a quantidade disponível)
-        [HttpPut("{id}/return")]
-        public ActionResult ReturnBook(int id)
-        {
-            var book = Books.FirstOrDefault(b => b.Id == id);
-            if (book == null)
-            {
-                return NotFound(new { Message = "Livro não encontrado!" });
-            }
-
-            // Aumenta a quantidade disponível
-            book.Quantity++;
-            return Ok(new { Message = $"Você devolveu o livro '{book.Title}'.", UpdatedQuantity = book.Quantity });
         }
     }
 }
