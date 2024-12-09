@@ -1,15 +1,17 @@
-﻿using Atlantis_Backend.Models;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Linq;
+using System.Xml.Linq;
 
-namespace Atlantis_Backend.Controllers
+namespace WebApplication1.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class BooksController : ControllerBase
+    public class LibraryController : ControllerBase
     {
-        private static readonly List<Book> Books = new List<Book>
-               {
+        private static List<Book> books = new List<Book>
+        {
             new Book { Id = 1, Title = "Dom Casmurro", Author = "Machado de Assis", Year = 1899, Quantity = 2 },
             new Book { Id = 2, Title = "Memórias Póstumas de Brás Cubas", Author = "Machado de Assis", Year = 1881, Quantity = 3 },
             new Book { Id = 3, Title = "Grande Sertão: Veredas", Author = "João Guimarães Rosa", Year = 1956, Quantity = 4 },
@@ -27,59 +29,36 @@ namespace Atlantis_Backend.Controllers
             new Book { Id = 15, Title = "Fogo Morto", Author = "José Lins do Rego", Year = 1943, Quantity = 1 }
         };
 
-        // Retorna todos os livros disponíveis
         [HttpGet]
-        public ActionResult<IEnumerable<Book>> GetAllAvailableBooks()
+        public ActionResult GetBooks()
         {
-            var availableBooks = Books.Where(b => b.Quantity > 0).ToList();
-            return Ok(availableBooks);
+            return Ok(books.Where(book => book.Quantity > 0));
         }
-
-        // Retorna um livro específico pelo ID
         [HttpGet("{id}")]
-        public ActionResult<Book> GetBookById(int id)
+        public ActionResult GetBookById(int id)
         {
-            var book = Books.FirstOrDefault(b => b.Id == id);
-            if (book == null || book.Quantity == 0)
-            {
-                return NotFound(new { Message = "Livro não disponível no momento!" });
-            }
+            var book = books.Find(b => b.Id == id);
+            if (book == null)
+                return NotFound(new{Message = "Livro não encontrado."});
             return Ok(book);
         }
 
-        // Aluga um livro (reduz a quantidade disponível)
-        [HttpPut("{id}/rent")]
+
+
+        [HttpPost("{id}/rent")]
         public ActionResult RentBook(int id)
         {
-            var book = Books.FirstOrDefault(b => b.Id == id);
+            var book = books.Find(b => b.Id == id);
             if (book == null)
-            {
-                return NotFound(new { Message = "Livro não encontrado!" });
-            }
+                return NotFound(new{ Message = "Livro não encontrado." });
+                Console.WriteLine("Restam" + book);
 
-            if (book.Quantity == 0)
-            {
-                return BadRequest(new { Message = $"O livro '{book.Title}' está esgotado no momento!" });
-            }
+            if (book.Quantity <= 0)
+                return BadRequest(new{ Message = "Livro esgotado no momento." });
 
-            // Reduz a quantidade disponível
             book.Quantity--;
-            return Ok(new { Message = $"Você alugou o livro '{book.Title}'.", RemainingQuantity = book.Quantity });
-        }
-
-        // Desaluga um livro (aumenta a quantidade disponível)
-        [HttpPut("{id}/return")]
-        public ActionResult ReturnBook(int id)
-        {
-            var book = Books.FirstOrDefault(b => b.Id == id);
-            if (book == null)
-            {
-                return NotFound(new { Message = "Livro não encontrado!" });
-            }
-
-            // Aumenta a quantidade disponível
-            book.Quantity++;
-            return Ok(new { Message = $"Você devolveu o livro '{book.Title}'.", UpdatedQuantity = book.Quantity });
+            return Ok(new{ Message = "Livro alugado com sucesso!" });
         }
     }
 }
+
