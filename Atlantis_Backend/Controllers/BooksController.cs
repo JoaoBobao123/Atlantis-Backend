@@ -1,8 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Atlantis_Backend.Models;
+using Atlantis_Backend.Requests;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;
-using System.Xml.Linq;
 
 namespace WebApplication1.Controllers
 {
@@ -29,36 +30,68 @@ namespace WebApplication1.Controllers
             new Book { Id = 15, Title = "Fogo Morto", Author = "José Lins do Rego", Year = 1943, Quantity = 1 }
         };
 
+        private List<Rent> rents = new List<Rent>();
+
+        // Endpoint para listar os livros disponíveis (com quantidade > 0)
         [HttpGet]
         public ActionResult GetBooks()
         {
             return Ok(books.Where(book => book.Quantity > 0));
         }
+
         [HttpGet("{id}")]
         public ActionResult GetBookById(int id)
         {
             var book = books.Find(b => b.Id == id);
             if (book == null)
-                return NotFound(new{Message = "Livro não encontrado."});
+                return NotFound(new { Message = "Livro não encontrado." });
             return Ok(book);
         }
 
-
-
+        // Endpoint para alugar um livro
         [HttpPost("{id}/rent")]
-        public ActionResult RentBook(int id)
+        public ActionResult RentBook(int id, [FromBody] RentRequests rent)
         {
             var book = books.Find(b => b.Id == id);
             if (book == null)
-                return NotFound(new{ Message = "Livro não encontrado." });
-                Console.WriteLine("Restam" + book);
+                return NotFound(new { Message = "Livro não encontrado." });
 
             if (book.Quantity <= 0)
-                return BadRequest(new{ Message = "Livro esgotado no momento." });
+                return BadRequest(new { Message = "Livro esgotado no momento." });
 
+            if (rent.Name == null|| rent.DataNascimento == null)
+            {
+                return BadRequest(new { Message = "Nome e/ou data de nascimento vazios." });
+            }
+
+            var alug = new Rent();
+
+            alug.Id = rents.Count() + 1;
+            alug.Name = rent.Name;
+            alug.DataNascimento = rent.DataNascimento;
+            alug.livroId = id;
+            alug.emprestado_at = DateTime.Now;
+            alug.devolvido_em = null;
+
+
+            rents.Add(alug);
+
+            // Decrementa a quantidade de livros disponíveis
             book.Quantity--;
-            return Ok(new{ Message = "Livro alugado com sucesso!" });
+
+            // Retorna uma resposta com o sucesso do aluguel e a quantidade restante
+            return Ok(new
+            {
+                Message = "Livro alugado com sucesso!",
+                QuantityRemaining = book.Quantity,
+                rents = rents
+            });
+        }
+
+        [HttpGet("rent/all")]
+        public ActionResult GetRent()
+        {
+            return Ok(rents);
         }
     }
 }
-
